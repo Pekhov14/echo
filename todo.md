@@ -3,5 +3,5 @@
 - [ ] Add const to write_newline
 - [ ] Add buffer for write for minimal syscalls
 - [ ] Add error handling for write
-- [ ] Add error handling for read
+- [x] Add error handling for read
 - [ ] Compile with name "echo"

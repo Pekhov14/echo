@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
   // flags
   // string end in c lang is \0
   while (arg_index < argc && argv[arg_index][0] == '-' &&
-         argv[arg_index][1] == '\0') {
+         argv[arg_index][1] != '\0') {
     char *pointer_to_flag_argument = argv[arg_index] + 1;
     int valid_flag = 1;
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
       break;
     }
 
-    pointer_to_flag_argument++; // next flag argument
+    arg_index++; // next flag argument
   }
 
   for (; arg_index < argc; arg_index++) {
