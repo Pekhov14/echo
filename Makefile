@@ -1,2 +1,2 @@
 run:
-	cc main.c && ./a.out hello world
+	cc main.c -o echo && ./echo -ne "Hello\nWorld"
