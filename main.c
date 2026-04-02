@@ -7,41 +7,37 @@
 void process_escape_sequences(char *str, int *len) {
   int i = 0;
   int j = 0;
+  int original_len = *len;
 
-  while (i < *len) {
-    if (str[i] == '\\' && i + 1 < *len) {
-      char escaped_char;
-      int advance = 2;
-
+  while (i < original_len) {
+    if (str[i] == '\\' && i + 1 < original_len) {
       switch (str[i + 1]) {
       case 'n':
-        escaped_char = '\n';
+        str[j++] = '\n';
+        i += 2;
         break;
       case 't':
-        escaped_char = '\t';
+        str[j++] = '\t';
+        i += 2;
         break;
       case 'r':
-        escaped_char = '\r';
+        str[j++] = '\r';
+        i += 2;
         break;
       case '\\':
-        escaped_char = '\\';
+        str[j++] = '\\';
+        i += 2;
         break;
       default:
         str[j++] = str[i++];
-        advance = 0;
         break;
       }
-
-      if (advance) {
-        str[j++] = escaped_char;
-        i += advance;
-      } else {
-        str[j++] = str[i++];
-      }
+    } else {
+      str[j++] = str[i++];
     }
-
-    *len = j;
   }
+
+  *len = j;
 }
 
 int main(int argc, char **argv) {
