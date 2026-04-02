@@ -4,9 +4,50 @@
 
 #define WHITE_SPACE " "
 
+void process_escape_sequences(char *str, int *len) {
+  int i = 0;
+  int j = 0;
+
+  while (i < *len) {
+    if (str[i] == '\\' && i + 1 < *len) {
+      char escaped_char;
+      int advance = 2;
+
+      switch (str[i + 1]) {
+      case 'n':
+        escaped_char = '\n';
+        break;
+      case 't':
+        escaped_char = '\t';
+        break;
+      case 'r':
+        escaped_char = '\r';
+        break;
+      case '\\':
+        escaped_char = '\\';
+        break;
+      default:
+        str[j++] = str[i++];
+        advance = 0;
+        break;
+      }
+
+      if (advance) {
+        str[j++] = escaped_char;
+        i += advance;
+      } else {
+        str[j++] = str[i++];
+      }
+    }
+
+    *len = j;
+  }
+}
+
 int main(int argc, char **argv) {
-  int new_line_flag = 1;
-  int e_flag = 0;
+  int new_line_flag = 1; // 1 - print new line, 0 - do not print new line
+  // todo: rename e_flag to escape_sequences_flag
+  int e_flag = 0; // 0 - no escape sequences, 1 - process escape sequences
   int arg_index = 1;
 
   // flags
@@ -42,17 +83,28 @@ int main(int argc, char **argv) {
     pointer_to_flag_argument++; // next flag argument
   }
 
-  for (arg_index = 1; arg_index < argc; arg_index++) {
+  for (; arg_index < argc; arg_index++) {
+    char *current_arg = argv[arg_index];
+    int len = strlen(current_arg);
+
+    if (e_flag) {
+      process_escape_sequences(current_arg, &len);
+    }
+
     // const void *buf
-    ssize_t written = write(STDOUT_FILENO, argv[arg_index],
-                            strlen(argv[arg_index])); // syscall -> kernel
-    if (written == -1) {
+    ssize_t bytes_written =
+        write(STDOUT_FILENO, argv[arg_index], len); // syscall -> kernel
+    if (bytes_written == -1) {
       return EXIT_FAILURE;
     }
 
     // todo: move to funcatin is_last_arg
     if (arg_index < argc - 1) {
-      write(STDOUT_FILENO, " ", 1); // write one bite
+      ssize_t space_written =
+          write(STDOUT_FILENO, WHITE_SPACE, 1); // write one bite
+      if (space_written == -1) {
+        return EXIT_FAILURE;
+      }
     }
   }
 
