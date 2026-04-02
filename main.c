@@ -4,6 +4,8 @@
 
 #define WHITE_SPACE " "
 
+int is_last_arg(int arg_index, int argc) { return arg_index == argc - 1; }
+
 void process_escape_sequences(char *str, int *len) {
   int i = 0;
   int j = 0;
@@ -42,12 +44,11 @@ void process_escape_sequences(char *str, int *len) {
 
 int main(int argc, char **argv) {
   int new_line_flag = 1; // 1 - print new line, 0 - do not print new line
-  // todo: rename e_flag to escape_sequences_flag
-  int e_flag = 0; // 0 - no escape sequences, 1 - process escape sequences
+  int escape_sequences_flag =
+      0; // 0 - no escape sequences, 1 - process escape sequences
   int arg_index = 1;
 
-  // flags
-  // string end in c lang is \0
+  // string end in C lang is \0
   while (arg_index < argc && argv[arg_index][0] == '-' &&
          argv[arg_index][1] != '\0') {
     char *pointer_to_flag_argument = argv[arg_index] + 1;
@@ -59,10 +60,10 @@ int main(int argc, char **argv) {
         new_line_flag = 0;
         break;
       case 'e':
-        e_flag = 1;
+        escape_sequences_flag = 1;
         break;
       case 'E':
-        e_flag = 0;
+        escape_sequences_flag = 0;
         break;
       default:
         valid_flag = 0;
@@ -83,7 +84,7 @@ int main(int argc, char **argv) {
     char *current_arg = argv[arg_index];
     int len = strlen(current_arg);
 
-    if (e_flag) {
+    if (escape_sequences_flag) {
       process_escape_sequences(current_arg, &len);
     }
 
@@ -95,7 +96,7 @@ int main(int argc, char **argv) {
     }
 
     // todo: move to funcatin is_last_arg
-    if (arg_index < argc - 1) {
+    if (is_last_arg(arg_index, argc)) {
       ssize_t space_written =
           write(STDOUT_FILENO, WHITE_SPACE, 1); // write one bite
       if (space_written == -1) {
