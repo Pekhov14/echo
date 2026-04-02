@@ -95,8 +95,7 @@ int main(int argc, char **argv) {
       return EXIT_FAILURE;
     }
 
-    // todo: move to funcatin is_last_arg
-    if (is_last_arg(arg_index, argc)) {
+    if (!is_last_arg(arg_index, argc)) {
       ssize_t space_written =
           write(STDOUT_FILENO, WHITE_SPACE, 1); // write one bite
       if (space_written == -1) {
