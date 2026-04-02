@@ -1,7 +1,7 @@
 - [x] Add function is_last_arg
 - [x] Add const to write_space
 - [x] Add const to write_newline
-- [ ] Add buffer for write for minimal syscalls
+- [x] Add buffer for write for minimal syscalls
 - [x] Add error handling for write
 - [x] Add error handling for read
 - [x] Compile with name "echo"

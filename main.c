@@ -80,6 +80,25 @@ int main(int argc, char **argv) {
     arg_index++; // next flag argument
   }
 
+  size_t total_estimated_size = 0;
+  for (int i = arg_index; i < argc; i++) {
+    total_estimated_size += strlen(argv[i]);
+    if (!is_last_arg(i, argc)) {
+      total_estimated_size += 1; // separator space
+    }
+  }
+  if (new_line_flag) {
+    total_estimated_size += 1; // new line
+  }
+
+  // Allocate buffer. In C, malloc returns void*
+  char *buffer = malloc(total_estimated_size);
+  if (!buffer) {
+    return EXIT_FAILURE;
+  }
+
+  size_t current_buffer_offset = 0;
+
   for (; arg_index < argc; arg_index++) {
     char *current_arg = argv[arg_index];
     int len = strlen(current_arg);
@@ -88,27 +107,23 @@ int main(int argc, char **argv) {
       process_escape_sequences(current_arg, &len);
     }
 
-    // const void *buf
-    ssize_t bytes_written =
-        write(STDOUT_FILENO, argv[arg_index], len); // syscall -> kernel
-    if (bytes_written == -1) {
-      return EXIT_FAILURE;
-    }
+    memcpy(buffer + current_buffer_offset, current_arg, len);
+    current_buffer_offset += len;
 
     if (!is_last_arg(arg_index, argc)) {
-      ssize_t space_written =
-          write(STDOUT_FILENO, WHITE_SPACE, 1); // write one bite
-      if (space_written == -1) {
-        return EXIT_FAILURE;
-      }
+      buffer[current_buffer_offset++] = ' ';
     }
   }
 
   if (new_line_flag) {
-    ssize_t written = write(STDOUT_FILENO, "\n", 1);
-    if (written == -1) {
-      return EXIT_FAILURE;
-    }
+    buffer[current_buffer_offset++] = '\n';
+  }
+
+  ssize_t bytes_written = write(STDOUT_FILENO, buffer, current_buffer_offset);
+  free(buffer);
+
+  if (bytes_written == -1) {
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;
